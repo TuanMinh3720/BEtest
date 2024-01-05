@@ -24,12 +24,13 @@ app.get("/api/inventory", async (req, res) => {
 
   let query = {};
   if (lowQuantity === "true") {
-    query = { instock: { $lt: 100 } };
+    query = { inStock: { $lt: 100 } };
   }
 
-  const inventory = await db.inventories.find(query).toArray();
+  const inventory = await db.inventory.find(query).toArray();
   res.json(inventory);
 });
+
 app.listen(3000, () => {
   console.log("App is running at 3000");
   connectToDb();
@@ -54,7 +55,7 @@ app.get("/api/orders", async (req, res) => {
   const orders = await db.orders.find({}).toArray();
   const ordersWithDescriptions = await Promise.all(
     orders.map(async order => {
-      const product = await db.inventories.findOne({ sku: order.item });
+      const product = await db.inventory.findOne({ sku: order.item });
       return { ...order, productDescription: product.description };
     })
   );

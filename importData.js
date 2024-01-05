@@ -1,6 +1,6 @@
 const { MongoClient } = require("mongodb");
 
-const data = {
+const db = {
   orders: [
     { "_id" : 1, "item" : "almonds", "price" : 12, "quantity" : 2 },
     { "_id" : 2, "item" : "pecans", "price" : 20, "quantity" : 1 },
@@ -18,22 +18,14 @@ const data = {
   ]
 };
 
-const connectAndImport = async () => {
+const connectToDb = () => {
   const client = new MongoClient("mongodb://localhost:27017");
-
-  try {
-    await client.connect();
+  client.connect(() => {
     const database = client.db("your_db_name");
-
-    // Insert data into collections
-    await database.collection("orders").insertMany(data.orders);
-    await database.collection("inventories").insertMany(data.inventory);
-    await database.collection("users").insertMany(data.users);
-
-    console.log("Data imported successfully.");
-  } finally {
-    await client.close();
-  }
+    db.inventory = database.collection("inventories");
+    db.orders = database.collection("orders");
+    db.users = database.collection("users");
+  });
 };
 
-connectAndImport();
+module.exports = { connectToDb, db };
